@@ -1,12 +1,3 @@
-/*Mengambil program dari geeksforgeeks setelah melihat tutorial
-youtube yang mengatakan bahwa branch and bound merupakan algoritma
-Depth First Search yang akan mengambil tiap node secara level per level
-(memeriksa tipa node ke yang paling dalam terlebih dahulu, baru dilanjutkan
-kembali ke node berikutnya yang terletak di level atas, namun hal ini akan
-pencarian tidak akan selesai)
-layaknya penggunaan stack
-https://www.geeksforgeeks.org/8-puzzle-problem-using-branch-and-bound/*/
-
 // Program to print path from root node to destination node 
 // for N*N -1 puzzle algorithm using Branch and Bound 
 // The solution assumes that instance of puzzle is solvable 
@@ -189,4 +180,3 @@ int main()
 
 	return 0; 
 } 
-
