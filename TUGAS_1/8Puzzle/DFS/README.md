@@ -1,3 +1,5 @@
+## Penjelasan Penerapan DFS Dalam 8 Puzzle
+
 Dalam program ini, melakukan pencarian state yang benar untuk menyelesaikan 8 puzzle dengan metode `Depth First Search`, dimana dalam pencariannya memungkinkan untuk pencarian degan bergerak mundur, yang diimplementasikan dibawah ini. Maksud dari bergerak mundur ini menginisiasi state yang sudah dilintasi.
 ```
 int dfs(int idsdepth){
