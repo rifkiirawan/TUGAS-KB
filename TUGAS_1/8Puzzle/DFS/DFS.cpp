@@ -1,182 +1,211 @@
-// Program to print path from root node to destination node 
-// for N*N -1 puzzle algorithm using Branch and Bound 
-// The solution assumes that instance of puzzle is solvable 
-#include <bits/stdc++.h> 
-using namespace std; 
-#define N 3 
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <deque>
+#include <stack>
+using namespace std;
 
-// state space tree nodes 
-struct Node 
-{ 
-	// stores the parent node of the current node 
-	// helps in tracing path when the answer is found 
-	Node* parent; 
-
-	// stores matrix 
-	int mat[N][N]; 
-
-	// stores blank tile coordinates 
-	int x, y;
-
-	// stores the number of moves so far 
-	int level; 
-}; 
-
-// Function to print N x N matrix 
-int printMatrix(int mat[N][N]) 
-{ 
-	for (int i = 0; i < N; i++) 
-	{ 
-		for (int j = 0; j < N; j++){
-			printf("%d ", mat[i][j]); 
+class State{ 
+public:
+	int a[9];
+	
+	State(){
+		for(int i=0; i<9; i++){
+				a[i] = rand() % 9;
+				while (found(i)) { a[i] = rand() % 9; } 
 		}
-		printf("\n"); 
-	} 
-} 
-
-// Function to allocate a new node 
-Node* newNode(int mat[N][N], int x, int y, int newX, 
-			int newY, int level, Node* parent) 
-{ 
-	Node* node = new Node; 
-
-	// set pointer for path to root 
-	node->parent = parent; 
-
-	// copy data from parent node to current node 
-	memcpy(node->mat, mat, sizeof node->mat); 
-
-	// move tile by 1 position 
-	swap(node->mat[x][y], node->mat[newX][newY]); 
-
-	// set number of moves so far 
-	node->level = level; 
-
-	// update new blank tile cordinates 
-	node->x = newX; 
-	node->y = newY; 
-
-	return node; 
-} 
-
-// botton, left, top, right 
-int row[] = { 1, 0, -1, 0 }; 
-int col[] = { 0, -1, 0, 1 }; 
-
-
-// Function to check if (x, y) is a valid matrix cordinate 
-int isSafe(int x, int y) 
-{ 
-	return (x >= 0 && x < N && y >= 0 && y < N); 
-} 
-
-// print path from root node to destination node 
-void printPath(Node* root) 
-{ 
-	if (root == NULL){
-		return;
 	}
-	printPath(root->parent); 
-	printMatrix(root->mat); 
-	printf("\n"); 
-} 
-
-bool testing (int mat[N][N],int final [N] [N])
- {
- 	for (int i = 0; i < N; i++) 
-	{ 
-		for (int j = 0; j < N; j++) 
-			if (mat [i] [j] != final [i] [j]) 
-			return false;
+	
+	void print(){
+		cout << "-----------------" << endl;
+		for(int i=0; i<9; i++){
+			if (i>0 && i%3==0) cout << endl;
+			cout << a[i] << "\t";
+		}
+		cout << endl << "-----------------" << endl;
 	}
- 	return true;
- }
-
-// Function to solve N*N - 1 puzzle algorithm using 
-// Branch and Bound. x and y are blank tile coordinates 
-// in initial state 
-void solve(int initial[N][N], int x, int y, 
-		int final[N][N]) 
-{ 
-	// Create a priority stack to store live nodes of 
-	// search tree; 
-	stack <Node*> pq;
 	
-	// create a root node and calculate its cost 
-	Node* root = newNode(initial, x, y, x, y, 0, NULL); 
+	int found(int i){
+		for(int j=0; j<i; j++){
+			if (a[i]==a[j]) return 1;
+		}
+		return 0;
+	}
 	
-	// Add root to list of live nodes; 
-	pq.push(root); 
-
-	// Finds a live node with least cost, 
-	// add its childrens to list of live nodes and 
-	// finally deletes it from the list. 
-	while (!pq.empty()) 
-	{ 
-		// Find a live node with least estimated cost 
-		Node* min = pq.top();
-
-		// The found node is deleted from the list of 
-		// live nodes 
-		pq.pop(); 
-
+	int findzero(){
+		for (int i=0; i<9; i++){
+			if (a[i]==0) return i;
+		}
+	}
 	
-		// if min is an answer node 
-		if (testing (min->mat, final)) 
-		{ 
-			// print the path from root to destination; 
-			printPath(min);
-			printf ("Move: %d", min->level);
-			return; 
-		} 
+	State exch(int i, int j){
+		State b;
+		for (int k=0; k<9; k++)
+			b.a[k]=a[k];
+		int t=b.a[i];
+		b.a[i]=b.a[j];
+		b.a[j]=t;
+		return b;
+	}
+	
+	int equal(State s){
+		for(int i=0; i<9; i++){
+			if (a[i]!=s.a[i]) return 0;
+		}
+		return 1;
+	}
+	
+	int goal(){
+		int g[9] = {1,2,3,8,0,4,7,6,5};
+		for (int i=0; i<9; i++){
+			if (a[i]!=g[i]) return 0; 
+		}
+		return 1;
+	}
+};
+
+class Node{
+public:
+	State s;
+	Node *father;
+	int action, cost, depth;
+	
+	Node(){
+		State s();
+		father=NULL;
+		action=-1;
+		cost=1;
+		depth=0;
+	}
+	
+	Node(State _s, Node *_father, int _action, int _depth){
+		s=_s;
+		father=_father;
+		action=_action;
+		depth=_depth;
+	}
+	
+	Node copy(){
+		Node b;
+		for (int i=0; i<9; i++)
+			b.s.a[i]=s.a[i];		
+		b.father=father;
+		b.action=action;
+		b.depth=depth;
 		
-		// do for each child of min 
-		// max 4 children for a node 
-		for (int i = 0; i < 4; i++) 
-		{ 
-			if (isSafe(min->x + row[i], min->y + col[i])) 
-			{ 
-				// create a child node and calculate 
-				// its cost 
-				Node* child = newNode(min->mat, min->x, 
-							min->y, min->x + row[i], 
-							min->y + col[i], 
-							min->level + 1, min);  
-
-				// Add child to list of live nodes 
-				pq.push(child); 
-			} 
-		} 
-	} 
-} 
-
-// Driver code 
-int main() 
-{ 
-	// Initial configuration 
-	// Value 0 is used for empty space 
-	int initial[N][N] = 
-	{ 
-		{1, 2, 3}, 
-		{5, 6, 0}, 
-		{7, 8, 4} 
-	}; 
-
-	// Solvable Final configuration 
-	// Value 0 is used for empty space 
+		return b;
+	}
 	
-	int final[N][N] = 
-	{ 
-		{1, 2, 3}, 
-		{5, 8, 6}, 
-		{0, 7, 4} 
-	}; 
-
-	// Blank tile coordinates in initial 
-	// configuration 
-	int x = 1, y = 2; 
-
-	solve(initial, x, y, final); 
-
-	return 0; 
-} 
+	void print(){
+		cout << "Cost: \t" << cost << endl;
+		cout << "Depth: \t" << depth << endl;
+	}
+	
+	void expand(deque<Node> *deque){
+		int p = s.findzero();
+		//moveup	(0)
+		if ((p!=0 && p!=1 && p!=2) && action!=1){
+			Node n(s.exch(p,p-3), this, 0, depth+1);
+			(*deque).push_back(n);
+		}
+		//movedown 	(1)
+		if ((p!=6 && p!=7 && p!=8) && action!=0){
+			Node n(s.exch(p,p+3), this, 1, depth+1);
+			(*deque).push_back(n);
+		}
+		//moveright (2)
+		if ((p!=2 && p!=5 && p!=8) && action!=3){
+			Node n(s.exch(p,p+1), this, 2, depth+1);
+			(*deque).push_back(n);
+		}
+		//moveleft 	(3)
+		if ((p!=0 && p!=3 && p!=6) && action!=2){
+			Node n(s.exch(p,p-1), this, 3, depth+1);
+			(*deque).push_back(n);
+		}
+	}
+	
+	int expanded(deque<State> *deque){
+		int max=(*deque).size()>depth?depth:(*deque).size();
+		for (int i=0; i<max; i++){
+			if ( s.equal( (*deque)[i] ) ){
+				return 1;
+			}
+		}
+		return 0;
+	}
+	int dfs(int idsdepth){
+		deque<Node> toexpand;
+		
+		if (idsdepth==-1) idsdepth = sizeof(int);
+		
+		toexpand.push_back(*this);
+		while ( !toexpand.empty() ){
+				if (toexpand.back().depth < idsdepth){
+					if ( toexpand.back().s.goal()==1 ){ 
+						if (idsdepth == sizeof(int)) 
+							cout << "------|DFS|------" << endl;
+						cout << "Solution found!" << endl;
+						toexpand.back().print();
+						toexpand.clear();
+						return cost;
+					}
+					else{
+						Node t;
+						t= toexpand.back().copy();
+						toexpand.pop_back();
+						t.expand(&toexpand);
+					}
+				}
+				else return 0;
+		}
+		if ( toexpand.empty() ) cout << endl << "Solution NOT found!" << endl;
+		return 0;
+	}
+	
+	int ids(){
+		for(int i=0;;i++){
+			int t = dfs(i);
+			if (t!=0) return t; 
+		}
+	}
+};
+	
+int main(int argc, char *argv[]){
+	int num=1;
+	int dfscost=0;
+	int dfsfail=0;
+	
+	cout << "\nEnter number of problems to solve: ";
+	cin >> num;
+    cout << endl;
+	
+	if (argc == 2){
+		cout << "-------DEMO------\n\n";
+	}
+	
+	for(int i=0;i<num;i++){
+		int _dfs=0;		
+		
+		cout << "\n    Problem " << i+1 << endl;
+		srand(argc==2?(2*i+1):time(NULL)+i);
+        Node n;
+		n.s.print();
+		
+		 _dfs=n.dfs(-1);
+		
+		if (_dfs>0) 
+			dfscost+=_dfs;
+		else
+			dfsfail+=1;
+		
+	}
+	if (num > 1){
+		cout << "\n\n------|DFS|-------";
+		cout << "\nAverage cost = " << dfscost/(num-dfsfail);
+		cout << "\nSolved " << num-dfsfail << "/" << num;
+		cout << "\n------------------";
+		cout << endl;
+	}
+	return 0;
+}
