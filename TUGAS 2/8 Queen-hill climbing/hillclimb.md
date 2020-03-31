@@ -92,15 +92,3 @@ Algoritma Simple Hill climbing :
 ### c. Stochastic Hill Climbing
 
 Itu tidak memeriksa semua node tetangga sebelum memutuskan node mana yang akan dipilih. Itu hanya memilih node tetangga secara acak dan memutuskan (berdasarkan jumlah peningkatan tetangga itu) apakah akan pindah ke tetangga itu atau untuk memeriksa yang lain.
-
-## State Space Diagram untuk Hill Climbing
-
-adalah representasi grafis dari himpunan status yang dapat dicapai oleh algoritma pencarian kami vs nilai fungsi objektif kami (fungsi yang ingin kami maksimalkan).
-
-`X - axis` menunjukkan ruang keadaan yaitu keadaan atau konfigurasi yang dapat dicapai algoritma kami.
-
-`Y - axis` menunjukkan nilai-nilai fungsi obyektif yang sesuai dengan keadaan tertentu.
-
-Solusi terbaik adalah ruang negara di mana fungsi objektif memiliki nilai maksimum (global maksimum).
-
-![8phc](https://user-images.githubusercontent.com/52326074/77142942-355a7680-6ab4-11ea-8c1d-66b86aaef6c9.png)
